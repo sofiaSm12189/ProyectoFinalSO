@@ -44,6 +44,7 @@ public class Proceso {
     }
 
 
+
     public int getIdProceso() {
         return idProceso;
     }
@@ -179,5 +180,16 @@ public class Proceso {
     public void setCdsAsignados(int cdsAsignados) {
         this.cdsAsignados = cdsAsignados;
     }
+
+    public void reducirTiempoCPU() {
+        if (tiempoCPURestante > 0) {
+            tiempoCPURestante--;
+        }
+    }
+    
+    public boolean estaCompleto() {
+        return tiempoCPURestante <= 0;
+    }
+    
 
 }

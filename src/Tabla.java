@@ -1,5 +1,5 @@
-import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
+import javax.swing.table.AbstractTableModel;
 
 public class Tabla extends AbstractTableModel {
     private ArrayList<Proceso> procesos;
@@ -30,16 +30,16 @@ public class Tabla extends AbstractTableModel {
         Proceso proceso = procesos.get(rowIndex);
         switch (columnIndex) {
             case 0: return proceso.getIdProceso();
-            case 1: return proceso.getEstatus();
+            case 1: return proceso.getEstado();
             case 2: return proceso.getTiempoLlegada();
             case 3: return proceso.getPrioridadInicial();
             case 4: return proceso.getPrioridadActual();
-            case 5: return proceso.getTiempoProcesadorRequerido();
-            case 6: return proceso.getTiempoProcesadorRestante();
+            case 5: return proceso.getTiempoCPURequerido();
+            case 6: return proceso.getTiempoCPURestante();
             case 7: return proceso.getMemoriaRequerida();
             case 8: return proceso.getUbicacionMemoria();
-            case 9: return proceso.getImpresorasSolicitadas();
-            case 10: return proceso.getImpresorasAsignadas();
+            case 9: return proceso.getImpresorasSolictadas();
+            case 10: return proceso.getImpresonasAsignadas();
             case 11: return proceso.getEscaneresSolicitados();
             case 12: return proceso.getEscaneresAsignados();
             case 13: return proceso.getModemsSolicitados();

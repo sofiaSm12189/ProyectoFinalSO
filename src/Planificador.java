@@ -38,7 +38,7 @@ public class Planificador {
 
     private void ejecutarProceso(Proceso proceso) {
         if (gestorMemoria.asignarMemoria(proceso) && gestorRecursos.asignarRecursos(proceso)) {
-            System.out.println("Ejecutando proceso: " + proceso.getId());
+            System.out.println("Ejecutando proceso: " + proceso.getIdProceso());
             proceso.reducirTiempoCPU();
             if (proceso.estaCompleto()) {
                 gestorMemoria.liberarMemoria(proceso);

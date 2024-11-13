@@ -46,7 +46,6 @@ public class Simulador {
             e.printStackTrace();
         }
     }
-
     public void cargarProcesos(String nombreArchivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
             String linea;
@@ -59,10 +58,11 @@ public class Simulador {
                 }
                 try {
                     Proceso proceso = new Proceso(
-                        idProceso++, Integer.parseInt(partes[0]), Integer.parseInt(partes[1]),
-                        Integer.parseInt(partes[2]), Integer.parseInt(partes[3]),
-                        Integer.parseInt(partes[4]), 0, Integer.parseInt(partes[5]), 0,
-                        Integer.parseInt(partes[6]), 0, Integer.parseInt(partes[7]), 0
+                        idProceso++, "Creado", Integer.parseInt(partes[0]), Integer.parseInt(partes[1]), 
+                        Integer.parseInt(partes[1]), Integer.parseInt(partes[2]), Integer.parseInt(partes[2]), 
+                        Integer.parseInt(partes[3]), "Sin asignar", Integer.parseInt(partes[4]), 0, 
+                        Integer.parseInt(partes[5]), 0, Integer.parseInt(partes[6]), 0, 
+                        Integer.parseInt(partes[7]), 0
                     );
                     planificador.agregarProceso(proceso);
                 } catch (NumberFormatException e) {
@@ -74,6 +74,7 @@ public class Simulador {
             e.printStackTrace();
         }
     }
+    
 
     public void ejecutar() {
         while (true) {
