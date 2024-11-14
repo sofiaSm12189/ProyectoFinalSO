@@ -1,5 +1,5 @@
-public class Proceso { 
-    
+public class Proceso {
+
     int idProceso;
     String estado;
     int tiempoLlegada;
@@ -8,7 +8,7 @@ public class Proceso {
     int tiempoCPURequerido;
     int tiempoCPURestante;
     int memoriaRequerida;
-    String ubicacionMemoria;
+    int ubicacionMemoria;
     int impresorasSolictadas;
     int impresonasAsignadas;
     int escaneresSolicitados;
@@ -17,13 +17,14 @@ public class Proceso {
     int modemsAsignados;
     int cdsSolicitados;
     int cdsAsignados;
+    int bloqueMemoria; // Nuevo atributo para almacenar el bloque de memoria asignado
 
     // Constructor que recibe todos los parámetros necesarios
     public Proceso(int idProceso, String estado, int tiempoLlegada, int prioridadInicial, int prioridadActual,
-                   int tiempoCPURequerido, int tiempoCPURestante, int memoriaRequerida, String ubicacionMemoria,
-                   int impresorasSolictadas, int impresonasAsignadas, int escaneresSolicitados, int escaneresAsignados,
-                   int modemsSolicitados, int modemsAsignados, int cdsSolicitados, int cdsAsignados) {
-                    super();
+            int tiempoCPURequerido, int tiempoCPURestante, int memoriaRequerida, int ubicacionMemoria,
+            int impresorasSolictadas, int impresonasAsignadas, int escaneresSolicitados, int escaneresAsignados,
+            int modemsSolicitados, int modemsAsignados, int cdsSolicitados, int cdsAsignados) {
+        super();
         this.idProceso = idProceso;
         this.estado = estado;
         this.tiempoLlegada = tiempoLlegada;
@@ -41,10 +42,19 @@ public class Proceso {
         this.modemsAsignados = modemsAsignados;
         this.cdsSolicitados = cdsSolicitados;
         this.cdsAsignados = cdsAsignados;
+        this.bloqueMemoria = -1; // Inicializar como no asignado
     }
 
+    // Métodos get y set para el nuevo atributo bloqueMemoria
+    public int getBloqueMemoria() {
+        return bloqueMemoria;
+    }
 
+    public void setBloqueMemoria(int bloqueMemoria) {
+        this.bloqueMemoria = bloqueMemoria;
+    }
 
+    // Resto de los métodos existentes
     public int getIdProceso() {
         return idProceso;
     }
@@ -52,11 +62,11 @@ public class Proceso {
     public void setIdProceso(int idProceso) {
         this.idProceso = idProceso;
     }
-    
+
     public String getEstado() {
         return estado;
     }
-    
+
     public void setEstado(String estado) {
         this.estado = estado;
     }
@@ -109,11 +119,11 @@ public class Proceso {
         this.memoriaRequerida = memoriaRequerida;
     }
 
-    public String getUbicacionMemoria() {
+    public int getUbicacionMemoria() {
         return ubicacionMemoria;
     }
 
-    public void setUbicacionMemoria(String ubicacionMemoria) {
+    public void setUbicacionMemoria(int ubicacionMemoria) {
         this.ubicacionMemoria = ubicacionMemoria;
     }
 
@@ -136,7 +146,7 @@ public class Proceso {
     public int getEscaneresSolicitados() {
         return escaneresSolicitados;
     }
-    
+
     public void setEscaneresSolicitados(int escaneresSolicitados) {
         this.escaneresSolicitados = escaneresSolicitados;
     }
@@ -186,10 +196,8 @@ public class Proceso {
             tiempoCPURestante--;
         }
     }
-    
+
     public boolean estaCompleto() {
         return tiempoCPURestante <= 0;
     }
-    
-
 }
