@@ -1,47 +1,43 @@
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class GestorMemoria {
-    private ArrayList<Integer> bloques;
+    private ArrayList<Boolean> bloques;
+    private Random random;
 
     public GestorMemoria(int numBloques) {
         bloques = new ArrayList<>();
+        random = new Random();
         for (int i = 0; i < numBloques; i++) {
-            bloques.add(-1); // Inicializar todos los bloques como libres (-1 significa libre)
+            bloques.add(false); // Inicializar todos los bloques como libres
         }
     }
 
-    public int asignarMemoria(Proceso proceso) {
-        for (int i = 0; i < bloques.size(); i++) {
-            if (bloques.get(i) == -1) { // Si el bloque está libre
-                bloques.set(i, proceso.getIdProceso()); // Asignar el bloque al ID del proceso
-                proceso.setUbicacionMemoria(i); // Guardar la ubicación del bloque en el proceso
-                return i; // Retornar el índice del bloque asignado
+    public List<Integer> asignarMemoria(int tamanioRequerido) {
+        List<Integer> bloquesAsignados = new ArrayList<>();
+        int bloquesNecesarios = (int) Math.ceil(tamanioRequerido / 32.0); // Ajuste según tamaño de bloque
+
+        while (bloquesAsignados.size() < bloquesNecesarios) {
+            int indice = random.nextInt(bloques.size());
+            if (!bloques.get(indice)) {
+                bloques.set(indice, true);
+                bloquesAsignados.add(indice);
             }
         }
-        return -1; // Retornar -1 si no hay bloques libres
+
+        return bloquesAsignados.size() == bloquesNecesarios ? bloquesAsignados : new ArrayList<>();
     }
 
-    public void liberarMemoria(Proceso proceso) {
-        int bloqueAsignado = proceso.getUbicacionMemoria(); // Obtener el bloque asignado al proceso
-        if (bloqueAsignado >= 0 && bloqueAsignado < bloques.size()) {
-            bloques.set(bloqueAsignado, -1); // Liberar el bloque
-            proceso.setUbicacionMemoria(-1); // Reiniciar la ubicación de memoria en el proceso
+    public void liberarMemoria(List<Integer> bloquesAsignados) {
+        for (int indice : bloquesAsignados) {
+            if (indice >= 0 && indice < bloques.size()) {
+                bloques.set(indice, false);
+            }
         }
     }
 
-    // Método para obtener el ID del proceso que ocupa un bloque específico
-    public int obtenerIdProcesoEnBloque(int index) {
-        if (index >= 0 && index < bloques.size()) {
-            return bloques.get(index); // Retorna el ID del proceso o -1 si está libre
-        }
-        return -1; // Retorna -1 si el índice está fuera de rango
+    public boolean isBloqueOcupado(int indice) {
+        return bloques.get(indice);
     }
-
-    public boolean isBloqueOcupado(int index) {
-        if (index >= 0 && index < bloques.size()) {
-            return bloques.get(index) != -1; // Retorna true si el bloque está ocupado (no es -1)
-        }
-        return false; // Retorna false si el índice está fuera de rango o el bloque está libre
-    }
-
 }

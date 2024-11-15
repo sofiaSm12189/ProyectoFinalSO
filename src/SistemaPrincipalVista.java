@@ -128,28 +128,22 @@ public class SistemaPrincipalVista extends JFrame {
 
     public void actualizarVista() {
         SwingUtilities.invokeLater(() -> {
-            modeloTabla.fireTableDataChanged(); // Actualizar la tabla de procesos
+            modeloTabla.fireTableDataChanged();
 
-            // Recorre todos los bloques de memoria
             for (int i = 0; i < bloquesMemoria.size(); i++) {
-                int idProceso = -1; // Inicializamos con un valor por defecto (-1 = no asignado)
+                int idProceso = -1;
 
-                // Buscamos si hay algún proceso que esté utilizando el bloque
                 for (Proceso p : procesos) {
-                    if (p.getUbicacionMemoria() == i) {
-                        idProceso = p.getIdProceso(); // Si hay un proceso, obtenemos su ID
-                        break; // Ya encontramos el proceso, no necesitamos seguir buscando
+                    if (p.getBloquesMemoria().contains(i)) {
+                        idProceso = p.getIdProceso();
+                        break;
                     }
                 }
 
-                // Determinamos si el bloque está ocupado o libre (representado por -1)
-                boolean ocupado = (idProceso != -1);
-
-                // Actualizamos la vista para ese bloque de memoria
-                actualizarBloqueMemoria(i, ocupado, idProceso);
+                actualizarBloqueMemoria(i, idProceso != -1, idProceso);
             }
 
-            repaint(); // Redibujamos la vista
+            repaint();
         });
     }
 

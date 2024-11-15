@@ -35,7 +35,7 @@ public class Simulador {
                     // Crear un nuevo proceso con todos los atributos necesarios
                     Proceso proceso = new Proceso(
                             tiempoLlegada, "Creado", tiempoLlegada, prioridad, prioridad,
-                            tiempoProcesador, tiempoProcesador, mbytes, -1,
+                            tiempoProcesador, tiempoProcesador, mbytes,
                             cantImpresora, 0, cantEscan, 0, cantModems, 0, cantCD, 0);
 
                     procesos.add(proceso); // Añadir a la lista local
@@ -62,7 +62,7 @@ public class Simulador {
                     Proceso proceso = new Proceso(
                             idProceso++, "Creado", Integer.parseInt(partes[0]), Integer.parseInt(partes[1]),
                             Integer.parseInt(partes[1]), Integer.parseInt(partes[2]), Integer.parseInt(partes[2]),
-                            Integer.parseInt(partes[3]), -1, Integer.parseInt(partes[4]), 0,
+                            Integer.parseInt(partes[3]), Integer.parseInt(partes[4]), 0,
                             Integer.parseInt(partes[5]), 0, Integer.parseInt(partes[6]), 0,
                             Integer.parseInt(partes[7]), 0);
                     procesos.add(proceso); // Añadir a la lista local
@@ -80,7 +80,7 @@ public class Simulador {
 
     public void ejecutar() {
         while (true) {
-            // Llamar al método ejecutar del planificador
+            // Ejecutar el planificador para mantener la cola de procesos actualizada
             planificador.ejecutar();
 
             // Procesar cada proceso en la lista
@@ -89,31 +89,39 @@ public class Simulador {
                 // memoria
                 if (proceso.getEstado().equals("Creado")) {
                     boolean recursosAsignados = gestorRecursos.asignarRecursos(proceso);
-                    int memoriaAsignada = gestorMemoria.asignarMemoria(proceso);
+
+                    // Intentamos asignar memoria necesaria en bloques
+                    List<Integer> memoriaAsignada = gestorMemoria.asignarMemoria(proceso.getMemoriaRequerida());
 
                     // Cambiamos el estado a "Listo" si recursos y memoria fueron asignados
                     // exitosamente
-                    if (recursosAsignados && memoriaAsignada != -1) {
+                    if (recursosAsignados && memoriaAsignada != null) {
                         proceso.setEstado("Listo");
-
+                        proceso.setBloquesAsignados(memoriaAsignada); // Almacena los bloques asignados en el proceso
                     }
                 }
 
-                // Reducir el tiempo de CPU si el proceso está "Listo" o "Ejecutando"
+                // Reducir el tiempo de CPU si el proceso está en "Listo" o "Ejecutando"
                 if (proceso.getEstado().equals("Listo") || proceso.getEstado().equals("Ejecutando")) {
                     proceso.reducirTiempoCPU();
 
-                    // Si el proceso ha completado su ejecución, liberar los recursos
+                    // Si el proceso ha completado su ejecución, liberar los recursos y memoria
                     if (proceso.estaCompleto()) {
                         proceso.setEstado("Terminado");
+
+                        // Liberar recursos y bloques de memoria asignados
                         gestorRecursos.liberarRecursos(proceso);
+                        gestorMemoria.liberarMemoria(proceso.getBloquesMemoria()); // Libera los bloques utilizados por
+                                                                                   // el proceso
                     }
                 }
             }
 
-            // Pausa para simular el quantum de tiempo
+            // Llama a la actualización de la vista para reflejar los cambios en la GUI
+            App.vista.actualizarVista();
+
             try {
-                Thread.sleep(1000); // Quantum de 1 segundo
+                Thread.sleep(1000); // Simula el tiempo entre ciclos de ejecución
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 public class Planificador {
@@ -36,29 +37,23 @@ public class Planificador {
     }
 
     private void ejecutarProceso(Proceso proceso) {
-        int bloqueAsignado = gestorMemoria.asignarMemoria(proceso); // Asignamos memoria
-        proceso.setUbicacionMemoria(bloqueAsignado);
+        List<Integer> bloquesAsignados = gestorMemoria.asignarMemoria(proceso.getMemoriaRequerida());
 
-        System.out.println(
-                "Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: " + proceso.getUbicacionMemoria());
-
-        if (bloqueAsignado != -1 && gestorRecursos.asignarRecursos(proceso)) {
-            System.out.println("Ejecutando proceso: " + proceso.getIdProceso());
+        if (!bloquesAsignados.isEmpty() && gestorRecursos.asignarRecursos(proceso)) {
+            proceso.setBloquesAsignados(bloquesAsignados);
+            System.out.println(
+                    "Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: " + proceso.getUbicacionMemoria());
             App.vista.actualizarVista();
-            App.vista.actualizarBloqueMemoria(bloqueAsignado, true, proceso.getIdProceso()); // Actualiza color y ID
 
             proceso.reducirTiempoCPU();
 
             if (proceso.estaCompleto()) {
-                gestorMemoria.liberarMemoria(proceso);
-                App.vista.actualizarBloqueMemoria(bloqueAsignado, false, -1); // Liberamos el bloque y lo ponemos en
-                                                                              // gris
+                gestorMemoria.liberarMemoria(proceso.getBloquesMemoria());
+                App.vista.actualizarVista(); // Actualiza visualmente la liberación
                 gestorRecursos.liberarRecursos(proceso);
             } else {
-                agregarProceso(proceso); // Volver a agregar a la cola si no ha terminado
+                agregarProceso(proceso);
             }
-        } else {
-            System.out.println("No se pudo asignar memoria o recursos al proceso: " + proceso.getIdProceso());
         }
     }
 

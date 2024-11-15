@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.table.AbstractTableModel;
 
 public class Tabla extends AbstractTableModel {
@@ -46,8 +48,9 @@ public class Tabla extends AbstractTableModel {
             case 7:
                 return proceso.getMemoriaRequerida();
             case 8:
-                int ubicacionMemoria = proceso.getUbicacionMemoria();
-                return ubicacionMemoria == -1 ? "Sin asignar" : ubicacionMemoria;
+                List<Integer> bloquesAsignados = proceso.getBloquesMemoria();
+                return bloquesAsignados.isEmpty() ? "Sin asignar" : bloquesAsignados.toString(); // Muestra los bloques
+                                                                                                 // asignados
             case 9:
                 return proceso.getImpresorasSolictadas();
             case 10:

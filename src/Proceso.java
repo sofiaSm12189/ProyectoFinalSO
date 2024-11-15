@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Proceso {
 
     int idProceso;
@@ -8,7 +11,7 @@ public class Proceso {
     int tiempoCPURequerido;
     int tiempoCPURestante;
     int memoriaRequerida;
-    int ubicacionMemoria;
+    List<Integer> ubicacionMemoria;
     int impresorasSolictadas;
     int impresonasAsignadas;
     int escaneresSolicitados;
@@ -17,11 +20,12 @@ public class Proceso {
     int modemsAsignados;
     int cdsSolicitados;
     int cdsAsignados;
-    int bloqueMemoria; // Nuevo atributo para almacenar el bloque de memoria asignado
+    List<Integer> bloquesMemoria; // Nueva lista para almacenar múltiples bloques
+    // Nuevo atributo para almacenar el bloque de memoria asignado
 
     // Constructor que recibe todos los parámetros necesarios
     public Proceso(int idProceso, String estado, int tiempoLlegada, int prioridadInicial, int prioridadActual,
-            int tiempoCPURequerido, int tiempoCPURestante, int memoriaRequerida, int ubicacionMemoria,
+            int tiempoCPURequerido, int tiempoCPURestante, int memoriaRequerida,
             int impresorasSolictadas, int impresonasAsignadas, int escaneresSolicitados, int escaneresAsignados,
             int modemsSolicitados, int modemsAsignados, int cdsSolicitados, int cdsAsignados) {
         super();
@@ -33,7 +37,7 @@ public class Proceso {
         this.tiempoCPURequerido = tiempoCPURequerido;
         this.tiempoCPURestante = tiempoCPURestante;
         this.memoriaRequerida = memoriaRequerida;
-        this.ubicacionMemoria = ubicacionMemoria;
+        this.ubicacionMemoria = new ArrayList<>();
         this.impresorasSolictadas = impresorasSolictadas;
         this.impresonasAsignadas = impresonasAsignadas;
         this.escaneresSolicitados = escaneresSolicitados;
@@ -42,16 +46,17 @@ public class Proceso {
         this.modemsAsignados = modemsAsignados;
         this.cdsSolicitados = cdsSolicitados;
         this.cdsAsignados = cdsAsignados;
-        this.bloqueMemoria = -1; // Inicializar como no asignado
+        this.bloquesMemoria = new ArrayList<>();
     }
 
-    // Métodos get y set para el nuevo atributo bloqueMemoria
-    public int getBloqueMemoria() {
-        return bloqueMemoria;
+    // Método para asignar los bloques de memoria
+    public void setBloquesAsignados(List<Integer> bloquesMemoria) {
+        this.bloquesMemoria = bloquesMemoria;
     }
 
-    public void setBloqueMemoria(int bloqueMemoria) {
-        this.bloqueMemoria = bloqueMemoria;
+    // Método para obtener los bloques de memoria asignados
+    public List<Integer> getBloquesMemoria() {
+        return bloquesMemoria;
     }
 
     // Resto de los métodos existentes
@@ -119,11 +124,11 @@ public class Proceso {
         this.memoriaRequerida = memoriaRequerida;
     }
 
-    public int getUbicacionMemoria() {
+    public List<Integer> getUbicacionMemoria() {
         return ubicacionMemoria;
     }
 
-    public void setUbicacionMemoria(int ubicacionMemoria) {
+    public void setUbicacionMemoria(List<Integer> ubicacionMemoria) {
         this.ubicacionMemoria = ubicacionMemoria;
     }
 
@@ -198,6 +203,6 @@ public class Proceso {
     }
 
     public boolean estaCompleto() {
-        return tiempoCPURestante <= 0;
+        return tiempoCPURestante == 0;
     }
 }
