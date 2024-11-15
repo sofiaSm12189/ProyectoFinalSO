@@ -8,6 +8,8 @@ public class Simulador {
     private Planificador planificador;
     private List<Proceso> procesos = new ArrayList<>(); // Lista de procesos si se necesita almacenar localmente
     private List<Proceso> procesosT = new ArrayList<>(); // Otra lista si es necesario (verificar su propósito)
+    private GestorRecursos gestorRecursos;
+    private GestorMemoria gestorMemoria;
 
     public Simulador(Planificador planificador) {
         this.planificador = planificador;
@@ -32,12 +34,11 @@ public class Simulador {
 
                     // Crear un nuevo proceso con todos los atributos necesarios
                     Proceso proceso = new Proceso(
-                        tiempoLlegada, "Creado", tiempoLlegada, prioridad, prioridad,
-                        tiempoProcesador, tiempoProcesador, mbytes, "Sin asignar",
-                        cantImpresora, 0, cantEscan, 0, cantModems, 0, cantCD, 0
-                    );
+                            tiempoLlegada, "Creado", tiempoLlegada, prioridad, prioridad,
+                            tiempoProcesador, tiempoProcesador, mbytes, -1,
+                            cantImpresora, 0, cantEscan, 0, cantModems, 0, cantCD, 0);
 
-                    procesos.add(proceso);  // Añadir a la lista local
+                    procesos.add(proceso); // Añadir a la lista local
                     procesosT.add(proceso); // Añadir a otra lista si es necesario
                     planificador.agregarProceso(proceso); // Añadir al planificador
                 }
@@ -46,6 +47,7 @@ public class Simulador {
             e.printStackTrace();
         }
     }
+
     public void cargarProcesos(String nombreArchivo) {
         try (BufferedReader br = new BufferedReader(new FileReader(nombreArchivo))) {
             String linea;
@@ -58,12 +60,13 @@ public class Simulador {
                 }
                 try {
                     Proceso proceso = new Proceso(
-                        idProceso++, "Creado", Integer.parseInt(partes[0]), Integer.parseInt(partes[1]), 
-                        Integer.parseInt(partes[1]), Integer.parseInt(partes[2]), Integer.parseInt(partes[2]), 
-                        Integer.parseInt(partes[3]), "Sin asignar", Integer.parseInt(partes[4]), 0, 
-                        Integer.parseInt(partes[5]), 0, Integer.parseInt(partes[6]), 0, 
-                        Integer.parseInt(partes[7]), 0
-                    );
+                            idProceso++, "Creado", Integer.parseInt(partes[0]), Integer.parseInt(partes[1]),
+                            Integer.parseInt(partes[1]), Integer.parseInt(partes[2]), Integer.parseInt(partes[2]),
+                            Integer.parseInt(partes[3]), -1, Integer.parseInt(partes[4]), 0,
+                            Integer.parseInt(partes[5]), 0, Integer.parseInt(partes[6]), 0,
+                            Integer.parseInt(partes[7]), 0);
+                    procesos.add(proceso); // Añadir a la lista local
+                    procesosT.add(proceso);
                     planificador.agregarProceso(proceso);
                 } catch (NumberFormatException e) {
                     System.out.println("Error al convertir un número en la línea: " + linea);
@@ -74,16 +77,50 @@ public class Simulador {
             e.printStackTrace();
         }
     }
-    
 
     public void ejecutar() {
         while (true) {
+            // Llamar al método ejecutar del planificador
             planificador.ejecutar();
+
+            // Procesar cada proceso en la lista
+            for (Proceso proceso : procesos) {
+                // Si el proceso está en estado "Creado", intentamos asignarle recursos y
+                // memoria
+                if (proceso.getEstado().equals("Creado")) {
+                    boolean recursosAsignados = gestorRecursos.asignarRecursos(proceso);
+                    int memoriaAsignada = gestorMemoria.asignarMemoria(proceso);
+
+                    // Cambiamos el estado a "Listo" si recursos y memoria fueron asignados
+                    // exitosamente
+                    if (recursosAsignados && memoriaAsignada != -1) {
+                        proceso.setEstado("Listo");
+
+                    }
+                }
+
+                // Reducir el tiempo de CPU si el proceso está "Listo" o "Ejecutando"
+                if (proceso.getEstado().equals("Listo") || proceso.getEstado().equals("Ejecutando")) {
+                    proceso.reducirTiempoCPU();
+
+                    // Si el proceso ha completado su ejecución, liberar los recursos
+                    if (proceso.estaCompleto()) {
+                        proceso.setEstado("Terminado");
+                        gestorRecursos.liberarRecursos(proceso);
+                    }
+                }
+            }
+
+            // Pausa para simular el quantum de tiempo
             try {
                 Thread.sleep(1000); // Quantum de 1 segundo
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<Proceso> getProcesos() {
+        return procesos;
     }
 }

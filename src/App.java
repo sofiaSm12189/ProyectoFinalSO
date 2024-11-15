@@ -1,12 +1,15 @@
 import java.util.ArrayList;
 
 public class App {
+    public static GestorMemoria gestorMemoria = new GestorMemoria(32);
+    public static GestorRecursos gestorRecursos = new GestorRecursos();
+    public static Planificador planificador = new Planificador(gestorMemoria, gestorRecursos);
+    public static Simulador simulador = new Simulador(planificador);
+    public static SistemaPrincipalVista vista = new SistemaPrincipalVista();;
+
     public static void main(String[] args) {
-        ArrayList<Proceso> listaProcesos = new ArrayList<>();
 
-
-        // Crear la ventana y pasar la lista de procesos
-        SistemaPrincipalVista vista = new SistemaPrincipalVista("Simulador del Sistema Operativo", listaProcesos);
+        vista.iniciarEjecucion();
+        vista.setVisible(true);
     }
 }
-

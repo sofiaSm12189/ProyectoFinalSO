@@ -6,7 +6,6 @@ public class Planificador {
     private Queue<Proceso> colaUsuario1 = new LinkedList<>();
     private Queue<Proceso> colaUsuario2 = new LinkedList<>();
     private Queue<Proceso> colaUsuario3 = new LinkedList<>();
-
     private GestorMemoria gestorMemoria;
     private GestorRecursos gestorRecursos;
 
@@ -37,16 +36,30 @@ public class Planificador {
     }
 
     private void ejecutarProceso(Proceso proceso) {
-        if (gestorMemoria.asignarMemoria(proceso) && gestorRecursos.asignarRecursos(proceso)) {
+        int bloqueAsignado = gestorMemoria.asignarMemoria(proceso); // Asignamos memoria
+        proceso.setUbicacionMemoria(bloqueAsignado);
+
+        System.out.println(
+                "Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: " + proceso.getUbicacionMemoria());
+
+        if (bloqueAsignado != -1 && gestorRecursos.asignarRecursos(proceso)) {
             System.out.println("Ejecutando proceso: " + proceso.getIdProceso());
+            App.vista.actualizarVista();
+            App.vista.actualizarBloqueMemoria(bloqueAsignado, true, proceso.getIdProceso()); // Actualiza color y ID
+
             proceso.reducirTiempoCPU();
+
             if (proceso.estaCompleto()) {
                 gestorMemoria.liberarMemoria(proceso);
+                App.vista.actualizarBloqueMemoria(bloqueAsignado, false, -1); // Liberamos el bloque y lo ponemos en
+                                                                              // gris
                 gestorRecursos.liberarRecursos(proceso);
             } else {
                 agregarProceso(proceso); // Volver a agregar a la cola si no ha terminado
             }
+        } else {
+            System.out.println("No se pudo asignar memoria o recursos al proceso: " + proceso.getIdProceso());
         }
     }
-}
 
+}
