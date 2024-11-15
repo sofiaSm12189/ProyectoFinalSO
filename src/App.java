@@ -5,11 +5,13 @@ public class App {
     public static GestorRecursos gestorRecursos = new GestorRecursos();
     public static Planificador planificador = new Planificador(gestorMemoria, gestorRecursos);
     public static Simulador simulador = new Simulador(planificador);
-    public static SistemaPrincipalVista vista = new SistemaPrincipalVista();;
+    public static SistemaPrincipalVista vista;
 
     public static void main(String[] args) {
 
-        vista.iniciarEjecucion();
+        vista = new SistemaPrincipalVista();
         vista.setVisible(true);
+        vista.iniciarEjecucion();
+
     }
 }

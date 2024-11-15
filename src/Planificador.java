@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -25,36 +26,48 @@ public class Planificador {
     }
 
     public void ejecutar() {
-        if (!colaTiempoReal.isEmpty()) {
-            ejecutarProceso(colaTiempoReal.poll());
-        } else if (!colaUsuario1.isEmpty()) {
-            ejecutarProceso(colaUsuario1.poll());
-        } else if (!colaUsuario2.isEmpty()) {
-            ejecutarProceso(colaUsuario2.poll());
-        } else if (!colaUsuario3.isEmpty()) {
-            ejecutarProceso(colaUsuario3.poll());
-        }
+        ejecutarProcesoDeCola(colaTiempoReal);
+        ejecutarProcesoDeCola(colaUsuario1);
+        ejecutarProcesoDeCola(colaUsuario2);
+        ejecutarProcesoDeCola(colaUsuario3);
     }
 
-    private void ejecutarProceso(Proceso proceso) {
-        List<Integer> bloquesAsignados = gestorMemoria.asignarMemoria(proceso.getMemoriaRequerida());
+    private void ejecutarProcesoDeCola(Queue<Proceso> cola) {
+        if (!cola.isEmpty()) {
+            Proceso proceso = cola.poll();
+            List<Integer> bloquesAsignados = gestorMemoria.asignarMemoria(proceso.getMemoriaRequerida());
 
-        if (!bloquesAsignados.isEmpty() && gestorRecursos.asignarRecursos(proceso)) {
-            proceso.setBloquesAsignados(bloquesAsignados);
-            System.out.println(
-                    "Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: " + proceso.getUbicacionMemoria());
-            App.vista.actualizarVista();
+            if (!bloquesAsignados.isEmpty() && gestorRecursos.asignarRecursos(proceso)) {
+                proceso.setEstado("Ejecutando");
+                proceso.setBloquesAsignados(bloquesAsignados);
+                System.out.println("Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: "
+                        + proceso.getUbicacionMemoria());
+                App.vista.actualizarVista();
 
-            proceso.reducirTiempoCPU();
+                proceso.reducirTiempoCPU();
 
-            if (proceso.estaCompleto()) {
-                gestorMemoria.liberarMemoria(proceso.getBloquesMemoria());
-                App.vista.actualizarVista(); // Actualiza visualmente la liberación
-                gestorRecursos.liberarRecursos(proceso);
+                if (proceso.estaCompleto()) {
+                    proceso.setEstado("Terminado");
+                    gestorMemoria.liberarMemoria(proceso.getBloquesMemoria());
+                    gestorRecursos.liberarRecursos(proceso);
+                    App.vista.actualizarVista();
+                } else {
+                    agregarProceso(proceso);
+                }
             } else {
+                proceso.setEstado("Creado");
                 agregarProceso(proceso);
             }
         }
     }
 
+    // Método para obtener todos los procesos gestionados en las colas
+    public List<Proceso> getProcesos() {
+        List<Proceso> procesos = new ArrayList<>();
+        procesos.addAll(colaTiempoReal);
+        procesos.addAll(colaUsuario1);
+        procesos.addAll(colaUsuario2);
+        procesos.addAll(colaUsuario3);
+        return procesos;
+    }
 }

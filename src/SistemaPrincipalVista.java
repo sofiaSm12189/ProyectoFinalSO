@@ -13,7 +13,7 @@ public class SistemaPrincipalVista extends JFrame {
     public static GestorRecursos gestorRecursos = new GestorRecursos();
     public static Planificador planificador = new Planificador(gestorMemoria, gestorRecursos);
     public static Simulador simulador = new Simulador(planificador);
-    private ArrayList<Proceso> procesos;
+    public static ArrayList<Proceso> procesos;
 
     public SistemaPrincipalVista() {
         simulador.cargarProcesos("src\\procesos.txt");
@@ -109,11 +109,9 @@ public class SistemaPrincipalVista extends JFrame {
 
     // Método para iniciar la ejecución de los procesos en un hilo separado
     public void iniciarEjecucion() {
-
         Thread hiloEjecucion = new Thread(() -> {
             while (true) {
-                planificador.ejecutar();
-                System.out.println("EJECUTANDO linea 102");
+                simulador.ejecutar(procesos); // Usar el método de ejecutar del simulador
                 actualizarVista();
                 try {
                     Thread.sleep(1000); // Simula el tiempo entre ciclos de ejecución
@@ -122,7 +120,6 @@ public class SistemaPrincipalVista extends JFrame {
                 }
             }
         });
-        System.out.println("hiloEjecucion.start();");
         hiloEjecucion.start();
     }
 

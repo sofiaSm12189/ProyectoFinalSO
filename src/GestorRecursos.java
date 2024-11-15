@@ -6,10 +6,11 @@ public class GestorRecursos {
 
     public boolean asignarRecursos(Proceso proceso) {
         if (proceso.getImpresorasSolictadas() <= impresoras &&
-            proceso.getEscaneresSolicitados() <= escaneres &&
-            proceso.getModemsSolicitados() <= modems &&
-            proceso.getCdsSolicitados() <= cds) {
-            
+                proceso.getEscaneresSolicitados() <= escaneres &&
+                proceso.getModemsSolicitados() <= modems &&
+                proceso.getCdsSolicitados() <= cds) {
+            System.out.println("Se le asignó recursos al procesos" + proceso.getIdProceso());
+
             impresoras -= proceso.getImpresorasSolictadas();
             escaneres -= proceso.getEscaneresSolicitados();
             modems -= proceso.getModemsSolicitados();
