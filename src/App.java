@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 
 public class App {
     public static GestorMemoria gestorMemoria = new GestorMemoria(32);

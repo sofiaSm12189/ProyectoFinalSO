@@ -14,6 +14,7 @@ public class SistemaPrincipalVista extends JFrame {
     public static Planificador planificador = new Planificador(gestorMemoria, gestorRecursos);
     public static Simulador simulador = new Simulador(planificador);
     private ArrayList<Proceso> procesos;
+    private volatile boolean ejecucionActiva = true;
 
     public SistemaPrincipalVista() {
         simulador.cargarProcesos("src\\procesos.txt");
@@ -109,47 +110,46 @@ public class SistemaPrincipalVista extends JFrame {
 
     // Método para iniciar la ejecución de los procesos en un hilo separado
     public void iniciarEjecucion() {
-
         Thread hiloEjecucion = new Thread(() -> {
-            while (true) {
-                planificador.ejecutar();
-                System.out.println("EJECUTANDO linea 102");
-                actualizarVista();
+            while (ejecucionActiva) {
+                // Ejecutar los procesos y verificar si se han completado todos
+                if (planificador.ejecutar()) {
+                    // Si todos los procesos han sido ejecutados, detener el hilo
+                    ejecucionActiva = false;
+                    System.out.println("Todos los procesos han sido ejecutados. Finalizando hilo...");
+                } else {
+                    System.out.println("Ejecutando procesos...");
+                }
+
                 try {
-                    Thread.sleep(1000); // Simula el tiempo entre ciclos de ejecución
+                    Thread.sleep(200); // Reducir el tiempo de espera para mayor fluidez
                 } catch (InterruptedException e) {
                     e.printStackTrace();
+                    Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
                 }
             }
         });
-        System.out.println("hiloEjecucion.start();");
+
         hiloEjecucion.start();
     }
 
     public void actualizarVista() {
         SwingUtilities.invokeLater(() -> {
-            modeloTabla.fireTableDataChanged(); // Actualizar la tabla de procesos
+            modeloTabla.fireTableDataChanged();
 
-            // Recorre todos los bloques de memoria
             for (int i = 0; i < bloquesMemoria.size(); i++) {
-                int idProceso = -1; // Inicializamos con un valor por defecto (-1 = no asignado)
-
-                // Buscamos si hay algún proceso que esté utilizando el bloque
+                int idProceso = -1;
                 for (Proceso p : procesos) {
-                    if (p.getUbicacionMemoria() == i) {
-                        idProceso = p.getIdProceso(); // Si hay un proceso, obtenemos su ID
-                        break; // Ya encontramos el proceso, no necesitamos seguir buscando
+                    if (p.getBloquesMemoria().contains(i)) {
+                        idProceso = p.getIdProceso();
+                        break;
                     }
                 }
 
-                // Determinamos si el bloque está ocupado o libre (representado por -1)
-                boolean ocupado = (idProceso != -1);
-
-                // Actualizamos la vista para ese bloque de memoria
-                actualizarBloqueMemoria(i, ocupado, idProceso);
+                actualizarBloqueMemoria(i, idProceso != -1, idProceso);
             }
 
-            repaint(); // Redibujamos la vista
+            repaint();
         });
     }
 
