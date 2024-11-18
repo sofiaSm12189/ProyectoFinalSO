@@ -22,37 +22,74 @@ public class Planificador {
             case 2 -> colaUsuario2.add(proceso);
             case 3 -> colaUsuario3.add(proceso);
         }
+        // App.vista.actualizarVista(); // Actualizar vista al agregar un proceso
     }
 
-    public void ejecutar() {
+    public boolean ejecutar() {
         if (!colaTiempoReal.isEmpty()) {
             ejecutarProceso(colaTiempoReal.poll());
+            return false; // Aún quedan procesos por ejecutar
         } else if (!colaUsuario1.isEmpty()) {
             ejecutarProceso(colaUsuario1.poll());
+            return false; // Aún quedan procesos por ejecutar
         } else if (!colaUsuario2.isEmpty()) {
             ejecutarProceso(colaUsuario2.poll());
+            return false; // Aún quedan procesos por ejecutar
         } else if (!colaUsuario3.isEmpty()) {
             ejecutarProceso(colaUsuario3.poll());
+            return false; // Aún quedan procesos por ejecutar
         }
+
+        // Si todas las colas están vacías, significa que todos los procesos se
+        // ejecutaron
+        return true;
     }
 
     private void ejecutarProceso(Proceso proceso) {
+        proceso.setEstado("Intentando ejecutar");
+        App.vista.actualizarVista();
+
+        // Intentar asignar memoria
         List<Integer> bloquesAsignados = gestorMemoria.asignarMemoria(proceso.getMemoriaRequerida());
 
-        if (!bloquesAsignados.isEmpty() && gestorRecursos.asignarRecursos(proceso)) {
+        // Intentar asignar recursos
+        boolean recursosAsignados = gestorRecursos.asignarRecursos(proceso);
+
+        if (!bloquesAsignados.isEmpty() && recursosAsignados) {
+            // Actualizar el estado del proceso
+            proceso.setEstado("Ejecutando");
             proceso.setBloquesAsignados(bloquesAsignados);
-            System.out.println(
-                    "Proceso ID: " + proceso.getIdProceso() + ", Ubicación Memoria: " + proceso.getUbicacionMemoria());
             App.vista.actualizarVista();
 
-            proceso.reducirTiempoCPU();
+            // Bucle para ejecutar el proceso mientras tenga tiempo de CPU restante
+            while (proceso.getTiempoCPURestante() > 0) {
+                // Reducir el tiempo de CPU restante
+                proceso.reducirTiempoCPU();
+                App.vista.actualizarVista();
 
-            if (proceso.estaCompleto()) {
-                gestorMemoria.liberarMemoria(proceso.getBloquesMemoria());
-                App.vista.actualizarVista(); // Actualiza visualmente la liberación
-                gestorRecursos.liberarRecursos(proceso);
-            } else {
-                agregarProceso(proceso);
+                try {
+                    // Simular el paso del tiempo
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
+                    e.printStackTrace();
+                }
+            }
+
+            // El proceso ha terminado
+            proceso.setEstado("Terminado");
+            gestorMemoria.liberarMemoria(proceso.getBloquesMemoria());
+            proceso.getBloquesMemoria().clear(); // Limpiar los bloques asignados
+            gestorRecursos.liberarRecursos(proceso);
+            App.vista.actualizarVista(); // Reflejar cambios
+        } else {
+            // No se pudieron asignar recursos o memoria, volver a encolar
+            proceso.setEstado("En espera");
+            agregarProceso(proceso);
+
+            // Liberar recursos asignados parcialmente si corresponde
+            if (!bloquesAsignados.isEmpty()) {
+                gestorMemoria.liberarMemoria(bloquesAsignados);
             }
         }
     }

@@ -1,7 +1,6 @@
 import java.util.ArrayList;
-import java.util.List;
-
 import javax.swing.table.AbstractTableModel;
+import java.util.List;
 
 public class Tabla extends AbstractTableModel {
     private ArrayList<Proceso> procesos;

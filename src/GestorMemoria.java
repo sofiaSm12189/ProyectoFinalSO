@@ -18,15 +18,30 @@ public class GestorMemoria {
         List<Integer> bloquesAsignados = new ArrayList<>();
         int bloquesNecesarios = (int) Math.ceil(tamanioRequerido / 32.0); // Ajuste según tamaño de bloque
 
-        while (bloquesAsignados.size() < bloquesNecesarios) {
-            int indice = random.nextInt(bloques.size());
-            if (!bloques.get(indice)) {
-                bloques.set(indice, true);
-                bloquesAsignados.add(indice);
+        // Crear una lista de índices libres
+        List<Integer> indicesLibres = new ArrayList<>();
+        for (int i = 0; i < bloques.size(); i++) {
+            if (!bloques.get(i)) {
+                indicesLibres.add(i);
             }
         }
 
-        return bloquesAsignados.size() == bloquesNecesarios ? bloquesAsignados : new ArrayList<>();
+        // Asignar bloques al azar
+        while (bloquesAsignados.size() < bloquesNecesarios && !indicesLibres.isEmpty()) {
+            int indiceAleatorio = random.nextInt(indicesLibres.size());
+            int bloqueSeleccionado = indicesLibres.remove(indiceAleatorio);
+            bloques.set(bloqueSeleccionado, true);
+            bloquesAsignados.add(bloqueSeleccionado);
+        }
+
+        // Verifica que se asignaron suficientes bloques
+        if (bloquesAsignados.size() < bloquesNecesarios) {
+            // Si no se asignaron suficientes bloques, liberar los asignados
+            liberarMemoria(bloquesAsignados);
+            return new ArrayList<>(); // Retornar lista vacía
+        }
+
+        return bloquesAsignados;
     }
 
     public void liberarMemoria(List<Integer> bloquesAsignados) {
