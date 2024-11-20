@@ -4,11 +4,9 @@ public class GestorRecursos {
     private int modems = 1;
     private int cds = 1;
 
-    // Método para asignar recursos al proceso
     public boolean asignarRecursos(Proceso proceso) {
         System.out.println("Intentando asignar recursos para el proceso " + proceso.getIdProceso());
-
-        // Mostrar los recursos solicitados antes de la asignación
+        
         System.out.println("Recursos solicitados para el proceso " + proceso.getIdProceso() + ": ");
         System.out.println("Impresoras solicitadas: " + proceso.getImpresorasSolictadas());
         System.out.println("Escáneres solicitados: " + proceso.getEscaneresSolicitados());
@@ -25,14 +23,12 @@ public class GestorRecursos {
             modems -= proceso.getModemsSolicitados();
             cds -= proceso.getCdsSolicitados();
 
-            // Mostrar los recursos asignados
             System.out.println("Recursos asignados al proceso " + proceso.getIdProceso() + ": ");
             System.out.println("Impresoras asignadas: " + proceso.getImpresorasSolictadas());
             System.out.println("Escáneres asignados: " + proceso.getEscaneresSolicitados());
             System.out.println("Modems asignados: " + proceso.getModemsSolicitados());
             System.out.println("CDs asignados: " + proceso.getCdsSolicitados());
 
-            // Mostrar los recursos disponibles después de la asignación
             System.out.println("Recursos disponibles después de la asignación: ");
             System.out.println("Impresoras disponibles: " + impresoras);
             System.out.println("Escáneres disponibles: " + escaneres);

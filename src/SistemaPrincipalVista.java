@@ -17,9 +17,10 @@ public class SistemaPrincipalVista extends JFrame {
     private volatile boolean ejecucionActiva = true;
 
     public SistemaPrincipalVista() {
-        simulador.cargarProcesos("src\\procesos.txt");
+        simulador.cargarProcesos("ProyectoFinalSO\\src\\procesos.txt");
         procesos = new ArrayList<>(simulador.getProcesos());
 
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Pantalla completa
         setTitle("Simulador de sistema operativo");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setBounds(20, 20, 900, 600);
@@ -44,7 +45,7 @@ public class SistemaPrincipalVista extends JFrame {
 
         crearPanelMemoria();
 
-        setVisible(true);
+       
     }
 
     private void ajustarAnchoColumnas() {
@@ -79,7 +80,7 @@ public class SistemaPrincipalVista extends JFrame {
 
                 // Si el bloque está ocupado
                 if (ocupado) {
-                    bloque.setBackground(Color.GREEN); // Bloque ocupado, color verde
+                    bloque.setBackground(new Color(104, 179, 239)); // Bloque ocupado, color verde
                     bloque.removeAll(); // Limpiar el bloque visual
                     bloque.add(new JLabel("ID: " + idProceso)); // Mostrar el ID del proceso
                 } else {
